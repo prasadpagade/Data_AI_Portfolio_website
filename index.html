@@ -1208,10 +1208,99 @@
             border-radius: 20px;
         }
 
+        /* Custom Cursor Styles */
+        body {
+            cursor: none; /* Hide default cursor to use custom */
+        }
+        
+        a, button, .skill-node, .project-card, .btn {
+            cursor: none;
+        }
+
+        .cursor-dot,
+        .cursor-outline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            z-index: 9999;
+            pointer-events: none;
+        }
+
+        .cursor-dot {
+            width: 8px;
+            height: 8px;
+            background-color: var(--gold);
+        }
+
+        .cursor-outline {
+            width: 40px;
+            height: 40px;
+            border: 2px solid rgba(212, 175, 55, 0.5);
+            transition: width 0.2s, height 0.2s, border-color 0.2s, background-color 0.2s;
+        }
+
+        /* Lenis Smooth Scroll Styles */
+        html.lenis, html.lenis body {
+            height: auto;
+        }
+        .lenis.lenis-smooth {
+            scroll-behavior: auto !important;
+        }
+        .lenis.lenis-smooth [data-lenis-prevent] {
+            overscroll-behavior: contain;
+        }
+        .lenis.lenis-stopped {
+            overflow: hidden;
+        }
+        .lenis.lenis-scrolling iframe {
+            pointer-events: none;
+        }
+        
+        /* Hero Vanta canvas container */
+        #vanta-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+        }
+        
+        /* Ensure hero content stays on top */
+        .hero-content {
+            position: relative;
+            z-index: 10;
+        }
+        .hero {
+            position: relative; /* ensure vanta is contained */
+            overflow: hidden;
+        }
+
+        /* Magnetic button wrap */
+        .magnetic-wrap {
+            display: inline-block;
+        }
+
+        /* Overwrite hero h1 styles to split lines via GSAP properly */
+        .hero h1, .hero .title, .hero .description {
+            animation: none !important;
+            opacity: 0; /* Let GSAP handle it */
+        }
+
+        /* Make project cards 3d enabled */
+        .projects-grid {
+            perspective: 1000px;
+        }
     </style>
 </head>
 
 <body>
+    <!-- Custom Cursor -->
+    <div class="cursor-dot" data-cursor-dot></div>
+    <div class="cursor-outline" data-cursor-outline></div>
+
     <nav>
         <ul>
             <li><a href="#home">Home</a></li>
@@ -1224,8 +1313,9 @@
     </nav>
 
     <section id="home" class="hero">
+        <div id="vanta-canvas"></div>
         <div class="hero-content">
-            <div class="status-badge">Available for Opportunities</div>
+            <div class="status-badge">Architecting AI Agents for GTM @ Gusto</div>
             <h1>Prasad Pagade <span class="phoenix-img-wrapper"><img src="assets/images/golden_phoenix_2.gif"
                         alt="Golden Phoenix" class="phoenix-img"></span></h1>
             <p class="title">Head of Data, Analytics & AI Innovation</p>
@@ -1285,6 +1375,21 @@
             <p class="section-subtitle">15+ years delivering impact at scale</p>
 
             <div class="timeline">
+                <div class="timeline-item">
+                    <div class="timeline-content">
+                        <h3>Principal AI Architect, GTM Autonomous Systems</h3>
+                        <div class="company">Gusto</div>
+                        <div class="duration">Jan 2025 – Present</div>
+                        <ul>
+                            <li><strong>Orchestrated GTM AI agents</strong> driving $900K+ in active pipeline acceleration through automated lifecycle tracking.</li>
+                            <li><strong>Engineered RAG-powered Voice Agents</strong> that simulate dynamic customer roleplays providing real-time feedback for sales training.</li>
+                            <li><strong>Architected outbound Voice AI</strong> for automated prospect engagement and discovery at scale.</li>
+                            <li><strong>Developed multi-model Upsell Agents</strong> (OpenAI, Anthropic, local ML) to calculate buying propensities and auto-generate personalized pitch decks.</li>
+                            <li><strong>Deployed conversational CRO Dashboard Agents</strong> turning complex BI into a real-time diagnostic reporting interface.</li>
+                        </ul>
+                    </div>
+                    <div class="timeline-dot"></div>
+                </div>
                 <div class="timeline-item">
                     <div class="timeline-content">
                         <h3>Head of Data Systems & Democratization</h3>
@@ -1705,22 +1810,7 @@
             });
         });
 
-        // Intersection Observer
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                }
-            });
-        }, { threshold: 0.1, rootMargin: '0px 0px -50px 0px' });
-
-        document.querySelectorAll('.project-card, .skill-node, .timeline-item, .about-content').forEach(el => {
-            el.style.opacity = '0';
-            el.style.transform = 'translateY(20px)';
-            el.style.transition = 'all 0.6s ease-out';
-            observer.observe(el);
-        });
+        // Intersection Observer (Replaced by GSAP ScrollTrigger)
 
         // Achievement Counter Animation
         function animateCounters() {
@@ -1822,19 +1912,6 @@
             });
         });
 
-
-        const chaiButton = document.getElementById('chaiButton');
-        window.addEventListener('scroll', () => {
-            if (window.scrollY > 500) {
-                chaiButton.classList.add('visible');
-            } else {
-                chaiButton.classList.remove('visible');
-            }
-        });
-        chaiButton.addEventListener('click', () => {
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
-
     </script>
 
     <!-- Floating Chai Cup - Back to Top -->
@@ -1860,22 +1937,252 @@
         </svg>
     </button>
 
+    <!-- GSAP & Lenis CDN -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/ScrollTrigger.min.js"></script>
+    <script src="https://unpkg.com/@studio-freight/lenis@1.0.33/dist/lenis.min.js"></script>
+    
+    <!-- Three.js and Vanta.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r134/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/vanta@latest/dist/vanta.net.min.js"></script>
 
-    <!-- Floating Chai Cup - Back to Top -->
-    <button class="chai-cup-button" id="chaiButton" aria-label="Scroll to top">
-        <svg class="steam" width="30" height="25" xmlns="http://www.w3.org/2000/svg">
-            <path class="steam-line" d="M 8 20 Q 8 10, 8 0" />
-            <path class="steam-line" d="M 15 20 Q 15 10, 15 0" />
-            <path class="steam-line" d="M 22 20 Q 22 10, 22 0" />
-        </svg>
-        <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-            <path d="M 6 6 L 8 18 C 8 19 9 20 10 20 L 14 20 C 15 20 16 19 16 18 L 18 6 Z" fill="rgba(255,255,255,0.2)"
-                stroke="white" stroke-width="2" />
-            <path d="M 18 8 Q 22 8, 22 12 Q 22 16, 18 16" fill="none" stroke="white" stroke-width="2" />
-            <ellipse cx="12" cy="6" rx="6" ry="1.5" fill="rgba(255,255,255,0.3)" stroke="white" stroke-width="2" />
-        </svg>
-    </button>
+    <script>
+        // -------------------------
+        // 1. Lenis Smooth Scrolling
+        // -------------------------
+        const lenis = new Lenis({
+            duration: 1.2,
+            easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
+            direction: 'vertical',
+            gestureDirection: 'vertical',
+            smooth: true,
+            mouseMultiplier: 1,
+            smoothTouch: false,
+            touchMultiplier: 2,
+            infinite: false,
+        });
 
+        function raf(time) {
+            lenis.raf(time);
+            requestAnimationFrame(raf);
+        }
+        requestAnimationFrame(raf);
+
+        // -------------------------
+        // 2. Custom Cursor
+        // -------------------------
+        const cursorDot = document.querySelector('[data-cursor-dot]');
+        const cursorOutline = document.querySelector('[data-cursor-outline]');
+        
+        let cursorX = 0, cursorY = 0, targetX = 0, targetY = 0;
+        
+        window.addEventListener('mousemove', function(e) {
+            cursorX = e.clientX;
+            cursorY = e.clientY;
+            
+            cursorDot.style.left = cursorX + 'px';
+            cursorDot.style.top = cursorY + 'px';
+        });
+
+        function updateCursor() {
+            let dx = cursorX - targetX;
+            let dy = cursorY - targetY;
+            targetX += dx * 0.15;
+            targetY += dy * 0.15;
+            
+            cursorOutline.style.left = targetX + 'px';
+            cursorOutline.style.top = targetY + 'px';
+            
+            requestAnimationFrame(updateCursor);
+        }
+        updateCursor();
+
+        const hoverElements = document.querySelectorAll('a, button, .skill-node, .project-card, .btn');
+        hoverElements.forEach(el => {
+            el.addEventListener('mouseenter', () => {
+                cursorOutline.style.width = '60px';
+                cursorOutline.style.height = '60px';
+                cursorOutline.style.backgroundColor = 'rgba(212, 175, 55, 0.1)';
+            });
+            el.addEventListener('mouseleave', () => {
+                cursorOutline.style.width = '40px';
+                cursorOutline.style.height = '40px';
+                cursorOutline.style.backgroundColor = 'transparent';
+            });
+        });
+
+        // -------------------------
+        // 3. Vanta.js Background
+        // -------------------------
+        window.addEventListener('DOMContentLoaded', () => {
+            VANTA.NET({
+                el: "#vanta-canvas",
+                mouseControls: true,
+                touchControls: true,
+                gyroControls: false,
+                minHeight: 200.00,
+                minWidth: 200.00,
+                scale: 1.00,
+                scaleMobile: 1.00,
+                color: 0xd4af37, // Gold
+                backgroundColor: 0x0a0a0a, // Black
+                points: 10.00,
+                maxDistance: 25.00,
+                spacing: 20.00
+            });
+        });
+
+        // -------------------------
+        // 4. GSAP Animations
+        // -------------------------
+        gsap.registerPlugin(ScrollTrigger);
+        
+        // Tie GSAP ScrollTrigger to Lenis
+        lenis.on('scroll', ScrollTrigger.update);
+        gsap.ticker.add((time)=>{
+          lenis.raf(time * 1000);
+        });
+        gsap.ticker.lagSmoothing(0);
+
+        window.addEventListener('load', () => {
+            // Hero Reveal
+            const heroTl = gsap.timeline();
+            heroTl.to(".hero h1, .hero .title, .hero .description", {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out",
+                delay: 0.2
+            });
+
+            // Experience Timeline ScrollTrigger
+            const timelineItems = gsap.utils.toArray('.timeline-item');
+            timelineItems.forEach((item, i) => {
+                gsap.fromTo(item.querySelector('.timeline-content'), 
+                    { y: 50, opacity: 0 },
+                    {
+                        scrollTrigger: {
+                            trigger: item,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        },
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power2.out"
+                    }
+                );
+                gsap.fromTo(item.querySelector('.timeline-dot'), 
+                    { scale: 0, opacity: 0 },
+                    {
+                        scrollTrigger: {
+                            trigger: item,
+                            start: "top 85%",
+                            toggleActions: "play none none reverse"
+                        },
+                        scale: 1,
+                        opacity: 1,
+                        duration: 0.5,
+                        ease: "back.out(1.7)"
+                    }
+                );
+            });
+
+            // Projects ScrollTrigger
+            const projectCards = gsap.utils.toArray('.project-card');
+            projectCards.forEach((card, i) => {
+                gsap.fromTo(card, 
+                    { y: 100, opacity: 0, rotationX: 10 },
+                    {
+                        scrollTrigger: {
+                            trigger: card,
+                            start: "top 90%",
+                            toggleActions: "play none none reverse"
+                        },
+                        y: 0,
+                        opacity: 1,
+                        rotationX: 0,
+                        duration: 1,
+                        ease: "power3.out"
+                    }
+                );
+            });
+            
+            // Other elements from IntersectionObserver
+            gsap.utils.toArray('.skill-node, .about-content').forEach(el => {
+                gsap.fromTo(el, 
+                    { y: 30, opacity: 0 },
+                    {
+                        scrollTrigger: {
+                            trigger: el,
+                            start: "top 90%",
+                            toggleActions: "play none none reverse"
+                        },
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power2.out"
+                    }
+                );
+            });
+            
+            // Magnetic Buttons
+            const magneticBtns = document.querySelectorAll('.btn');
+            magneticBtns.forEach(btn => {
+                btn.addEventListener('mousemove', function(e) {
+                    const position = btn.getBoundingClientRect();
+                    const x = e.clientX - position.left - position.width / 2;
+                    const y = e.clientY - position.top - position.height / 2;
+                    
+                    gsap.to(btn, {
+                        x: x * 0.3,
+                        y: y * 0.3,
+                        duration: 0.4,
+                        ease: "power2.out"
+                    });
+                });
+                btn.addEventListener('mouseleave', function(e) {
+                    gsap.to(btn, {
+                        x: 0,
+                        y: 0,
+                        duration: 0.4,
+                        ease: "elastic.out(1, 0.3)"
+                    });
+                });
+            });
+
+            // Glare effect on Project Cards Hover
+            projectCards.forEach(card => {
+                card.addEventListener('mousemove', (e) => {
+                    const rect = card.getBoundingClientRect();
+                    const x = e.clientX - rect.left;
+                    const y = e.clientY - rect.top;
+                    
+                    const xPct = (x / rect.width) - 0.5;
+                    const yPct = (y / rect.height) - 0.5;
+                    
+                    gsap.to(card, {
+                        rotationY: xPct * 8,
+                        rotationX: -yPct * 8,
+                        transformPerspective: 1000,
+                        duration: 0.5,
+                        ease: "power1.out"
+                    });
+                });
+                
+                card.addEventListener('mouseleave', () => {
+                    gsap.to(card, {
+                        rotationY: 0,
+                        rotationX: 0,
+                        duration: 0.5,
+                        ease: "power1.out"
+                    });
+                });
+            });
+        });
+
+    </script>
 </body>
 
 </html>
